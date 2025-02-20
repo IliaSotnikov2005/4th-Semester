@@ -31,10 +31,7 @@ module Functions =
     let getListOfpowersOfTwo n m =
         if m >= n then
             let rec generatePowers current power =
-                if power > m then
-                    []
-                else
-                    current :: generatePowers (current * 2.0) (power + 1)
+                if power > m then []
+                else current :: generatePowers (current * 2.0) (power + 1)
             generatePowers (pown 2.0 n) n
-        else
-            []
+        else []

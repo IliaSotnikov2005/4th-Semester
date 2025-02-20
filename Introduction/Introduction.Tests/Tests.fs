@@ -9,34 +9,34 @@ type FactorialTests() =
     [<Test>]
     member this.``Factorial of negative number should return None``() =
         let result = factorial -3
-        Assert.That(None, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(None))
 
     [<Test>]
     member this.``Factorial of 0 should return Some 1``() =
         let result = factorial 0
-        Assert.That(Some 1, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(Some 1))
 
     [<Test>]
     member this.``Factorial of 5 should return Some 120``() =
         let result = factorial 5
-        Assert.That(Some 120, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(Some 120))
 
     [<Test>]
     member this.``Factorial of 3 should return Some 6``() =
         let result = factorial 3
-        Assert.That(Some 6, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(Some 6))
 
 [<TestFixture>]
 type FibonacciTests() =
     [<Test>]
     member this.``Fibonacci of negative number should return None``() =
         let result = fibonacci -4
-        Assert.That(None, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(None))
 
     [<Test>]
     member this.``Fibonacci of 6 should return Some 8``() =
         let result = fibonacci 6
-        Assert.That(Some 8, Is.EqualTo(result))
+        Assert.That(result, Is.EqualTo(Some 8))
 
 [<TestFixture>]
 type ReverseTests() =
