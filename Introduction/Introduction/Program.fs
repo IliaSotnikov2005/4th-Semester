@@ -6,10 +6,13 @@ module Functions =
         elif n = 0 then Some 1
         else Some (Seq.reduce (*) {1 .. n})
 
-    let rec fibonacci n =
+    let fibonacci n =
         if n < 1 then None
-        elif n = 1 || n = 2 then Some 1
-        else Some (fibonacci(n - 1).Value + fibonacci(n - 2).Value)
+        else
+            let rec loop a b counter =
+                if counter = 1 then Some b
+                else loop b (a + b) (counter - 1)
+            loop 0 1 n
 
     let reverse lst =
         let rec reverser acc lst =
