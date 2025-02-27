@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage[russian]{babel}
+
+\begin{document}
+
+\section{S K K}
+    $
+    SKK = (\lambda x.\lambda y.\lambda z.xz(yz))(\lambda x.\lambda y.x)(\lambda x.\lambda y.x) \to \\
+    (\lambda y.\lambda z.(\lambda x.\lambda p.x)z(yz))(\lambda x.\lambda y.x) \to \\
+    \lambda z.(\lambda x.\lambda p.x)z((\lambda q.\lambda y.q)z) \to \\
+    \lambda z.(\lambda x.\lambda p.x)z(\lambda y.z) \to \\
+    \lambda z.(\lambda p.z)(\lambda y.z) \to \\
+    \lambda z.z = I
+    $
+
+\section{Нормализация}
+    $
+    (\lambda a.(\lambda b.bb)(\lambda b.bb))b((\lambda c.(cb))(\lambda a.a)) \to \\
+    ((\lambda b.bb)(\lambda b.bb))((\lambda c.(cb))(\lambda a.a)) \to \\
+    ((\lambda b.bb)(\lambda b.bb))((\lambda c.(cb))(\lambda a.a)) \to \\
+    $
+    левая часть зациклилась, следовательно, у терма нет нормальной формы
+\end{document}
