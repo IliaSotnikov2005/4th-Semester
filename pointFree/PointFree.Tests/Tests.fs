@@ -1,6 +1,5 @@
 ﻿module Tests
 
-open FsCheck
 open FsCheck.Xunit
 open PointFree
 
