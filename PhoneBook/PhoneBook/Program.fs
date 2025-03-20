@@ -14,8 +14,8 @@ let printCommands () =
     find phone <name> - find entry by name
     find name <phoneNumber> - find entry by phone number
     list - list all entries
-    save <filepath> - save current data to file, default path is ./phoneBook.txt
-    read <filepath> - read data from file, default is ./phoneBook.txt
+    save <filepath> - save current data to file
+    read <filepath> - read data from file
     "
 
 let handleResponse response phoneBook =

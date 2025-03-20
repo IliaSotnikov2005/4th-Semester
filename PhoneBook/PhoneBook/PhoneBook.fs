@@ -36,18 +36,13 @@ let listEntries phoneBook =
     AllEntries phoneBook, phoneBook
 
 let save path phoneBook =
-    let defaultPath = "./phoneBook.txt"
-    let filePath = if path = "" then defaultPath else path
     let lines = phoneBook |> List.map(fun entry -> $"{entry.Name} - {entry.PhoneNumber}")
-    System.IO.File.WriteAllLines(filePath, lines)
+    System.IO.File.WriteAllLines(path, lines)
     Message "OK", phoneBook
 
 let read path phoneBook =
-    let defaultPath = "./phoneBook.txt"
-    let filePath = if path = "" then defaultPath else path
-
-    if System.IO.File.Exists(filePath) then
-        let lines = System.IO.File.ReadAllLines(filePath)
+    if System.IO.File.Exists path then
+        let lines = System.IO.File.ReadAllLines(path)
         let entries =
             lines |> Array.map (fun line ->
                 let parts = line.Split " - "
