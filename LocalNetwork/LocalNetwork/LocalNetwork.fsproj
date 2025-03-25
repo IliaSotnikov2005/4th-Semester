@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="IOperatingSystem.fs" />
+    <Compile Include="NavOS.fs" />
+    <Compile Include="Windows.fs" />
+    <Compile Include="Linux.fs" />
+    <Compile Include="MacOS.fs" />
+    <Compile Include="Computer.fs" />
+    <Compile Include="LocalNetwork.fs" />
+    <Compile Include="Library.fs" />
+  </ItemGroup>
+
+</Project>
