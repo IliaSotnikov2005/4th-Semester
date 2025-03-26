@@ -11,8 +11,8 @@ type LocalNetwork(computers: Computer list, connections: Connection Set) =
         |> Set.fold (
             fun atRick (c1, c2) ->
             match c1.IsInfected, c2.IsInfected with
-            | true, false -> Set.add c2 atRick
-            | false, true -> Set.add c1 atRick
+            | true, false -> if c2.Os.InfectionChance <> 0 then Set.add c2 atRick else atRick
+            | false, true -> if c1.Os.InfectionChance <> 0 then Set.add c1 atRick else atRick
             | _ -> atRick
         ) Set.empty
 

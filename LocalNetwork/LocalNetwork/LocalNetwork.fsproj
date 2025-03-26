@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Include="IOperatingSystem.fs" />
-    <Compile Include="NavOS.fs" />
     <Compile Include="Windows.fs" />
     <Compile Include="Linux.fs" />
     <Compile Include="MacOS.fs" />
