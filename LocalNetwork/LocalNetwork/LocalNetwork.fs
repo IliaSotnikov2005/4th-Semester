@@ -4,7 +4,7 @@ type Connection = Computer * Computer
 
 type LocalNetwork(computers: Computer list, connections: Connection Set) =
     member this.Computers = computers
-    member this.Connenctions = connections
+    member this.Connections = connections
 
     member this.getComputersAtRick () =
         connections
@@ -22,14 +22,15 @@ type LocalNetwork(computers: Computer list, connections: Connection Set) =
         match computersAtRisk.IsEmpty with
         | true -> false
         | false ->
-            let infectionResults =
-                computersAtRisk
-                |> Set.map (fun computer -> 
-                    let infected = computer.TryInfect()
-                    computer.Name, infected)
-            
-            infectionResults
-            |> Set.filter(fun (name, infected) -> infected)
-            |> Set.iter (fun (name, result) ->
-                printfn $"{name} - INFECTED")
-            true
+                computersAtRisk |> Set.iter (fun c -> c.TryInfect() |> ignore)
+                true
+        
+    member this.Print() =
+        let maxLeftLength = 
+            this.Connections |> Set.map(fun (c1, _) -> c1.Name.Length + if c1.IsInfected then " (infected)".Length else 0) |> Set.maxElement
+
+        this.Connections
+        |> Set.iter (fun (c1, c2) ->
+            let left = sprintf "%s%s" c1.Name (if c1.IsInfected then " (infected)" else "")
+            let right = sprintf "%s%s" c2.Name (if c2.IsInfected then " (infected)" else "")
+            printfn "%*s <-> %s" maxLeftLength left right)
