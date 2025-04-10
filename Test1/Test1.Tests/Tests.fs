@@ -15,7 +15,7 @@ let ``endlessSequence2 should compute correct values for first 5 elements`` () =
     endlessSequence2 |> Seq.take 5 |> should equal expected
 
 [<Test>]
-let ``bypass should return empty list for empty tree``() =
+let ``bypass should return correct list for bin tree``() =
     let tree = Node(4,
         Node(2, Node(1, Empty, Empty), Node(3, Empty, Empty)),
         Node(6, Node(5, Empty, Empty), Node(7, Empty, Empty)))
@@ -23,7 +23,7 @@ let ``bypass should return empty list for empty tree``() =
     bypass (fun x -> x > 3) tree |> should equal [4; 5; 6; 7]
 
 [<Test>]
-let ``Queue worsk correct``() =
+let ``Queue works correct``() =
     let queue = PriorityQueue<int>()
     queue.Enqueue 1 1
     queue.Enqueue 2 2
