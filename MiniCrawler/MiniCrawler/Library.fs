@@ -3,11 +3,15 @@
 open System.Text.RegularExpressions
 open System.Net.Http
 
-let downloadHtmlAsync (url: string) =
+let downloadHtmlAsync (httpClient: HttpClient) (url: string) =
     async {
-        use httpClient = new HttpClient()
-        let! response = httpClient.GetStringAsync(url) |> Async.AwaitTask
-        return response
+        try
+            let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+            response.EnsureSuccessStatusCode() |> ignore
+            let! html = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            return Ok html
+        with ex ->
+            return Error ex.Message
     }
 
 let getLinks (html: string) =
@@ -18,30 +22,42 @@ let getLinks (html: string) =
     |> Seq.distinct
     |> List.ofSeq
 
-let crawl (url: string) =
+let crawl (httpClient: HttpClient) (url: string) =
     async {
-        let! html = downloadHtmlAsync url
-        let links = getLinks html
-        let! result =
-            links
-            |> List.map (fun link ->
-                async {
-                    let! content = downloadHtmlAsync link
-                    return link, content.Length
-                })
-            |> Async.Parallel
-        let res = result |> Set.ofArray
-        return res
+        let! html = downloadHtmlAsync httpClient url
+        match html with
+        | Ok html ->
+            let links = getLinks html
+            let! result =
+                links
+                |> List.map (fun link ->
+                    async {
+                        let! content = downloadHtmlAsync httpClient link
+                        match content with
+                        | Ok content ->
+                            return Ok (link, content.Length)
+                        | Error message ->
+                            return Error (link, message)
+                    })
+                |> Async.Parallel
+            
+            return result
+        | Error message-> return [| Error (url, message) |]
     }
 
-let printResult (result: Set<string * int>) =
-    result
-    |> Set.iter (fun (url, length) -> printfn "%s - %d chars" url length)
+let printResults (results: Result<string * int, string * string>[]) =
+    results |> Array.iter (function
+        | Ok (url, length) ->
+            printfn "%s - %d chars" url length
+        | Error (url, errorMsg) ->
+            printfn "%s - Error when executing request: %s" url errorMsg
+    )
 
 let main() =
     async {
-        let! result = crawl "http://localhost:8000/test.html"
-        printResult result
+        let httpClient = new HttpClient()
+        let! result = crawl httpClient "https://demo.cyotek.com/"
+        printResults result
     }
 
 main() |> Async.RunSynchronously // python -m http.server 8000
