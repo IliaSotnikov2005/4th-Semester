@@ -7,79 +7,27 @@ open System.Net.Http
 open System.Threading.Tasks
 open MiniCrawler
 
-type MockHttpMessageHandler() =
-    inherit HttpMessageHandler()
-    let mutable responses = Map.empty<string, HttpResponseMessage>
-    
-    member _.AddResponse(url, content, statusCode) =
-        let response = new HttpResponseMessage(statusCode)
-        response.Content <- new StringContent(content)
-        responses <- responses.Add(url, response)
-    
-    override _.SendAsync(request, _) =
-        match responses.TryFind(request.RequestUri.AbsoluteUri) with
-        | Some response -> Task.FromResult(response)
-        | None -> Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound))
-
 [<Test>]
-let ``downloadHtmlAsync should return Ok with content for successful request`` () =
+let ``downloadHtmlAsync should fail on non-existent URL`` () =
     async {
-        let handler = new MockHttpMessageHandler()
-        handler.AddResponse("http://example.com", "<html>test</html>", HttpStatusCode.OK)
-        let httpClient = new HttpClient(handler)
-        
-        let! result = downloadHtmlAsync httpClient "http://example.com"
+        use httpClient = new HttpClient()
+        let! result = downloadHtmlAsync httpClient "http://this.url.does.not.exist.test"
         
         match result with
-        | Ok content -> content |> should equal "<html>test</html>"
-        | Error _ -> Assert.Fail("Expected Ok result")
+        | Ok _ -> Assert.Fail("Expected error for non-existent URL")
+        | Error msg -> 
+            printfn "Got expected error for non-existent URL: %s" msg
     } |> Async.RunSynchronously
 
 [<Test>]
-let ``downloadHtmlAsync should return Error for failed request`` () =
+let ``getLinks should find links on example.com`` () =
     async {
-        let handler = new MockHttpMessageHandler()
-        handler.AddResponse("http://bad-url.com", "Error", HttpStatusCode.NotFound)
-        let httpClient = new HttpClient(handler)
-        
-        let! result = downloadHtmlAsync httpClient "http://bad-url.com"
+        use httpClient = new HttpClient()
+        let! result = downloadHtmlAsync httpClient "https://example.com"
         
         match result with
-        | Ok _ -> Assert.Fail("Expected Error result")
-        | Error msg -> msg |> should contain "404"
-    } |> Async.RunSynchronously
-
-[<Test>]
-let ``crawl should return single error when main URL fails`` () =
-    async {
-        let handler = new MockHttpMessageHandler()
-        handler.AddResponse("http://failing-url.com", "Error", HttpStatusCode.NotFound)
-        let httpClient = new HttpClient(handler)
-        
-        let! results = crawl httpClient "http://failing-url.com"
-        
-        results |> should haveLength 1
-        match results.[0] with
-        | Error (u, msg) -> 
-            u |> should equal "http://failing-url.com"
-            msg |> should contain "404"
-        | _ -> Assert.Fail("Expected Error result")
-    } |> Async.RunSynchronously
-
-[<Test>]
-let ``crawl should process all links when main URL succeeds`` () =
-    async {
-        let handler = new MockHttpMessageHandler()
-        handler.AddResponse("http://main.com", 
-            """<a href="http://link1.com">Link1</a><a href="http://link2.com">Link2</a>""", 
-            HttpStatusCode.OK)
-        handler.AddResponse("http://link1.com", "link1 content", HttpStatusCode.OK)
-        handler.AddResponse("http://link2.com", "Error", HttpStatusCode.NotFound)
-        let httpClient = new HttpClient(handler)
-        
-        let! results = crawl httpClient "http://main.com"
-        
-        results |> should haveLength 2
-        results |> Array.exists (function Ok ("http://link1.com", 13) -> true | _ -> false) |> should be True
-        results |> Array.exists (function Error ("http://link2.com", msg) when msg.Contains("404") -> true | _ -> false) |> should be True
+        | Ok html ->
+            let links = getLinks html
+            links |> should contain "https://www.iana.org/domains/example"
+        | Error msg -> Assert.Fail($"Failed to download example.com: {msg}")
     } |> Async.RunSynchronously

@@ -52,12 +52,3 @@ let printResults (results: Result<string * int, string * string>[]) =
         | Error (url, errorMsg) ->
             printfn "%s - Error when executing request: %s" url errorMsg
     )
-
-let main() =
-    async {
-        let httpClient = new HttpClient()
-        let! result = crawl httpClient "https://demo.cyotek.com/"
-        printResults result
-    }
-
-main() |> Async.RunSynchronously // python -m http.server 8000
