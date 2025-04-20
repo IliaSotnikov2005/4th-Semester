@@ -1,8 +1,10 @@
-﻿module PhoneBookIntereface
+﻿/// A module containing phone book UI.
+module PhoneBookIntereface
 
 open PhoneBook
 open System
 
+/// Prints command list.
 let printCommands () =
     printf "
     Phone book
@@ -18,6 +20,7 @@ let printCommands () =
     read <filepath> - read data from file
     "
 
+/// Handles response from phone book.
 let handleResponse response phoneBook =
     match response with
     | Message message ->
@@ -31,6 +34,7 @@ let handleResponse response phoneBook =
             printfn "%s - %s" entry.Name entry.PhoneNumber
         phoneBook
 
+/// Handles user command.
 let handleCommand command phoneBook =
     match command with
         | [| "help" |] ->
@@ -61,6 +65,7 @@ let handleCommand command phoneBook =
             printf "Invalid command. Use help for help."
             phoneBook
 
+/// A start method with main loop.
 let start =
     let rec mainLoop phoneBook =
         printf "\n> "
