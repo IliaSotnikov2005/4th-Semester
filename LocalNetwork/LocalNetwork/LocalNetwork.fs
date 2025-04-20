@@ -1,11 +1,18 @@
 namespace LocalNetwork
 
+/// A type representing connection between two computers.
 type Connection = Computer * Computer
 
+/// A type representing local network.
 type LocalNetwork(computers: Computer list, connections: Connection Set) =
+    
+    /// Computers in the local network.
     member this.Computers = computers
+   
+    /// Connections in the local network.
     member this.Connections = connections
 
+    /// Gets computers at infection risk.
     member this.getComputersAtRick () =
         connections
         |> Set.fold (
@@ -16,6 +23,7 @@ type LocalNetwork(computers: Computer list, connections: Connection Set) =
             | _ -> atRick
         ) Set.empty
 
+    /// Step of infection.
     member this.Step () =
         let computersAtRisk = this.getComputersAtRick()
         
@@ -25,6 +33,7 @@ type LocalNetwork(computers: Computer list, connections: Connection Set) =
                 computersAtRisk |> Set.iter (fun c -> c.TryInfect() |> ignore)
                 true
         
+    /// Prints network status.
     member this.Print() =
         let maxLeftLength = 
             this.Connections |> Set.map(fun (c1, _) -> c1.Name.Length + if c1.IsInfected then " (infected)".Length else 0) |> Set.maxElement
