@@ -1,7 +1,7 @@
 ﻿module Introduction.Tests
 
 open NUnit.Framework
-open Introduction.Functions
+open Functions
 
 [<TestFixture>]
 type FactorialTests() =
@@ -34,8 +34,8 @@ type FibonacciTests() =
         Assert.That(result, Is.EqualTo(None))
 
     [<Test>]
-    member this.``Fibonacci of 6 should return Some 8``() =
-        let result = fibonacci 6
+    member this.``Fibonacci of 7 should return Some 8``() =
+        let result = fibonacci 7
         Assert.That(result, Is.EqualTo(Some 8))
 
 [<TestFixture>]
