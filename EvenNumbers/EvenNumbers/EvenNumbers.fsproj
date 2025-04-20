@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="EvenNumbersCounter.fs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FsCheck" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

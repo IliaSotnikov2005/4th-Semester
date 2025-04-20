@@ -1,9 +1,9 @@
 ﻿module Tests
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
+open FsUnit
 open EvenNumbersCounter
-open FsCheck.Xunit
+open FsCheck.NUnit
 
 [<Property>]
 let ``All implementations should be equivalent`` (list: int list) =
@@ -19,15 +19,15 @@ let implementations = [
 ]
 
 let testData = [
-    ([], 0)
-    ([1; 2; 3; 4; 5], 2)
-    ([2; 4; 6; 8], 4)
-    ([1; 3; 5; 7], 0)
-    ([0; -2; -3; -4], 3)
+    TestCaseData( List<int>.Empty, 0).SetName("Empty list should return 0")
+    TestCaseData([1; 2; 3; 4; 5], 2).SetName("[1;2;3;4;5] should return 2")
+    TestCaseData([2; 4; 6; 8], 4).SetName("[2;4;6;8] should return 4")
+    TestCaseData([1; 3; 5; 7], 0).SetName("[1;3;5;7] should return 0")
+    TestCaseData([0; -2; -3; -4], 3).SetName("[0;-2;-3;-4] should return 3")
 ]
 
-[<Theory>]
-[<MemberData(nameof(testData))>]
+[<Test>]
+[<TestCaseSource(nameof(testData))>]
 let ``All implementations should count even numbers correctly`` (list: int list, expected: int) =
     for implementation in implementations do
         let result = implementation list
