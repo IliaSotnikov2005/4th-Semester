@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RoundingUpWorkflow", "RoundingUpWorkflow\RoundingUpWorkflow.fsproj", "{DC912F3C-235B-48C7-B7C8-EBC4E82235BD}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RoundingUpWorkflow.Tests", "RoundingUpWorkflow.Tests\RoundingUpWorkflow.Tests.fsproj", "{AA5FB8B5-FBD1-4F50-A735-14906D11B2D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC912F3C-235B-48C7-B7C8-EBC4E82235BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC912F3C-235B-48C7-B7C8-EBC4E82235BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC912F3C-235B-48C7-B7C8-EBC4E82235BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC912F3C-235B-48C7-B7C8-EBC4E82235BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA5FB8B5-FBD1-4F50-A735-14906D11B2D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA5FB8B5-FBD1-4F50-A735-14906D11B2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA5FB8B5-FBD1-4F50-A735-14906D11B2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA5FB8B5-FBD1-4F50-A735-14906D11B2D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
