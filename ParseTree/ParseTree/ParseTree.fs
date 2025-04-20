@@ -1,15 +1,19 @@
-﻿module ParseTree
+﻿/// A parse tree module.
+module ParseTree
 
+/// A type representing the sign.
 type Sign =
 | Plus
 | Minus
 | Divide
 | Multiply
 
+/// A type representing the parse tree.
 type ParseTree =
 | Operand of number : int
 | Operator of Sign * ParseTree * ParseTree
 
+/// Evaluates the value of the parse tree.
 let parse parseTree =
     let calculate sign operand1 operand2 =
         match sign with
