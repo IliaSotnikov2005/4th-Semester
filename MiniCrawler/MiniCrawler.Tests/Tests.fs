@@ -2,9 +2,7 @@
 
 open NUnit.Framework
 open FsUnit
-open System.Net
 open System.Net.Http
-open System.Threading.Tasks
 open MiniCrawler
 
 [<Test>]

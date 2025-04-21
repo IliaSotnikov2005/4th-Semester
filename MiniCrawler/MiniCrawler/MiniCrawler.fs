@@ -1,8 +1,10 @@
-﻿module MiniCrawler
+﻿/// A module containing mini crawler.
+module MiniCrawler
 
 open System.Text.RegularExpressions
 open System.Net.Http
 
+/// Downloads html async.
 let downloadHtmlAsync (httpClient: HttpClient) (url: string) =
     async {
         try
@@ -14,14 +16,16 @@ let downloadHtmlAsync (httpClient: HttpClient) (url: string) =
             return Error ex.Message
     }
 
+/// Gets links from html.
 let getLinks (html: string) =
-    let pattern = @"<a\s+[^>]*href\s*=\s*[""'](https?://[^""']+)[""'][^>]*>"
+    let pattern = @"<a\s+href\s*=\s*""https?://[^""]+""[^>]*>[^<]*<\/a>"
     Regex.Matches(html, pattern, RegexOptions.IgnoreCase)
     |> Seq.cast<Match>
     |> Seq.map (fun m -> m.Groups.[1].Value)
     |> Seq.distinct
     |> List.ofSeq
 
+/// Crawls through the html page by its url.
 let crawl (httpClient: HttpClient) (url: string) =
     async {
         let! html = downloadHtmlAsync httpClient url
@@ -45,6 +49,7 @@ let crawl (httpClient: HttpClient) (url: string) =
         | Error message-> return [| Error (url, message) |]
     }
 
+/// Prints results.
 let printResults (results: Result<string * int, string * string>[]) =
     results |> Array.iter (function
         | Ok (url, length) ->
