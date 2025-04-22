@@ -1,6 +1,6 @@
 namespace Lazy
 
-type SimpleLazy<'a>(supplier: uint -> 'a) =
+type SingleThreadLazy<'a>(supplier: unit -> 'a) =
     let mutable evaluatedValue = None
     let mutable supplierOption = Some supplier
 
