@@ -1,6 +1,7 @@
 namespace Lazy
 open System.Threading
 
+/// The lock-free version guarantees correct operation in multithreaded mode; calculations are not performed more than once.
 type LockFreeLazy<'a>(supplier: unit -> 'a) =
     [<VolatileField>]
     let mutable evaluatedValue = None

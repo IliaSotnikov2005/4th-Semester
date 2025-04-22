@@ -1,5 +1,6 @@
 namespace Lazy
 
+/// The version with a guarantee of correct operation in single-threaded mode (without synchronization).
 type SingleThreadLazy<'a>(supplier: unit -> 'a) =
     let mutable evaluatedValue = None
     let mutable supplierOption = Some supplier

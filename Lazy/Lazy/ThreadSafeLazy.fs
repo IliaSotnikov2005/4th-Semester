@@ -1,5 +1,6 @@
 namespace Lazy
 
+/// The version with a guarantee of correct operation in multithreaded mode; the calculation is not performed more than once.
 type ThreadSafeLazy<'a>(supplier: unit -> 'a) =
     let mutable evaluatedValue = None
     let mutable supplierOption = Some supplier
