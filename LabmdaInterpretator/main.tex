@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\begin{document}
+
+\section*{Grammar}
+
+\begin{flushleft}
+\begin{tabular}{l l l}
+var      & ::= & [a-z]+ \\
+var\_seq & ::= & var var\_seq | var \\
+factor   & ::= & var | (term) \\
+abstraction & ::= & \texttt{"\textbackslash"} var\_seq \texttt{"."} term \\
+factor\_seq & ::= & factor factor\_seq | factor \\
+application & ::= & factor factor\_seq \\
+term     & ::= & abstraction | application | factor \\
+bind     & ::= & \texttt{"let"} var \texttt{"="} term \\
+program  & ::= & bind program | term \\
+\end{tabular}
+\end{flushleft}
+
+\section*{Example}
+\begin{flushleft}
+\textbf{x y z} \\
+\begin{tabular}{l}
+program -> term -> application -> factor factor\_seq -> var factor\_seq -> \\
+x factor\_seq -> x factor factor\_seq -> x var factor\_seq -> \\
+x y factor\_seq -> x y factor -> x y var -> x y z \\
+\end{tabular}
+\vspace{1em}
+
+\textbf{let T = \textbackslash x y.x \\
+T a b}
+
+\begin{tabular}{l}
+program -> bind program \\
+\quad -> \texttt{"let"} var \texttt{"="} term program \\
+\quad -> \texttt{"let"} T \texttt{"="} term program \\
+\quad -> \texttt{"let"} T \texttt{"="} abstraction program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash var\_seq.term program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash var var\_seq.term program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x var\_seq.term program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x var.term program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.term program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.factor program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.var program \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x program \\ 
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x term \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x application \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x factor factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x var factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T factor factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T var factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T a factor\_seq \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T a factor \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T a var \\
+\quad -> \texttt{"let"} T \texttt{"="} \textbackslash x y.x T a b
+\end{tabular}
+\end{flushleft}
+
+
+\end{document}
