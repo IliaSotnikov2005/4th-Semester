@@ -3,9 +3,10 @@ module LambdaInterpretator
 
 /// A type representing lambda term.
 type Term =
-| Variable of string
-| Application of Term * Term
-| Abstraction of string * Term
+    | Variable of string
+    | Application of Term * Term
+    | Abstraction of string * Term
+    override x.ToString() = sprintf "%A" x 
 
 /// Finds free variables in a term.
 let freeVariables term =

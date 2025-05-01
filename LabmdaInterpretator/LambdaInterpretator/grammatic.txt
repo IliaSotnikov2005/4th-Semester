@@ -1,0 +1,11 @@
+var ::= [a-z]+
+factor ::= var | (term)
+abstraction ::= \var.term
+factor_seq ::= factor factor_seq | factor
+application ::= factor factor_seq
+term ::= abstraction | application | factor
+
+x y z
+term -> application -> factor factor_seq -> var factor_seq ->
+x factor_seq -> x factor factor_seq -> x var factor_seq ->
+x y factor_seq -> x y factor -> x y var -> x y z
