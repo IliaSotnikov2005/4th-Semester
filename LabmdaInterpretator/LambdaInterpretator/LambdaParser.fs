@@ -17,9 +17,10 @@ let pFactor =
 let pAbstraction =
     pipe3
         (pchar '\\' .>> ws)
-        (many1Chars (anyOf ['a'..'z']) .>> ws)
+        (many1 (many1Chars (anyOf ['a'..'z']) .>> ws))
         (pchar '.' .>> ws >>. pTerm)
-        (fun _ param body -> Abstraction(param, body)) .>> ws
+        (fun _ args body ->
+            List.foldBack (fun arg acc -> Abstraction(arg, acc)) args body) .>> ws
 
 let pFactorSequence =
     many1 pFactor |>>
