@@ -32,23 +32,26 @@ let newVariable usedVariables =
     nextVariable "a"
 
 /// Performs substitude.
-let rec substitude variable baseTerm substitutionTerm =
-    match baseTerm with
-    | Variable x when x = variable -> substitutionTerm
-    | Variable _ -> baseTerm
-    | Application (term1, term2) -> Application (substitude variable term1 substitutionTerm, substitude variable term2 substitutionTerm)
-    | Abstraction (x, body) when x = variable -> baseTerm
-    | Abstraction (x, body) when isFree x substitutionTerm ->
-        let newVar = newVariable (Set.union (freeVariables body) (freeVariables substitutionTerm))
-        let newBody = substitude x body (Variable newVar)
-        Abstraction (newVar, substitude variable newBody substitutionTerm)
-    | Abstraction (x, body) -> Abstraction (x, substitude variable body substitutionTerm)
+let rec substitude var sub term =
+    match term with
+    | Variable v when v = var -> sub
+    | Application(t1, t2) -> 
+        Application(substitude var sub t1, substitude var sub t2)
+    | Abstraction(v, body) when v = var -> term
+    | Abstraction(v, body) when isFree v sub ->
+        let newVar = newVariable (Set.union (freeVariables body) (freeVariables sub))
+        let newBody = substitude v (Variable newVar) body
+        Abstraction(newVar, substitude var sub newBody)
+    | Abstraction(v, body) -> Abstraction(v, substitude var sub body)
+    | _ -> term
 
 /// Performs beta-reduction.
 let rec betaReduction term =
     match term with
     | Variable _ -> term
-    | Application (Abstraction(x, body), argument) ->
-        substitude x body argument
-    | Application (term1, term2) -> Application (betaReduction term1, betaReduction term2)
-    | Abstraction (x, body) -> Abstraction(x, betaReduction body)
+    | Application(Abstraction(x, body), arg) ->
+        betaReduction (substitude x arg body)
+    | Application(t1, t2) ->
+        let reduced = Application(betaReduction t1, betaReduction t2)
+        if reduced <> term then betaReduction reduced else reduced
+    | Abstraction(x, body) -> Abstraction(x, betaReduction body)
