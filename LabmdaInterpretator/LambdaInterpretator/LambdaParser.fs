@@ -4,67 +4,76 @@ open LambdaInterpretator
 open FParsec
 open System.Collections.Generic
 
-let ws = skipMany (satisfy (fun c -> c = ' ' || c = '\t')) .>> optional (pstring "//" >>. skipRestOfLine false)
-let pVariable = many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> ws |>> Variable
+let skipSpaces = skipMany (satisfy (fun c -> c = ' ' || c = '\t'))
+let pVariable = many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces |>> Variable
 
 let pTerm, pTermRef = createParserForwardedToRef()
 
 let pFactor =
     choice [
         pVariable
-        between (pchar '(' .>> ws) (pchar ')' .>> ws) pTerm
-    ] .>> ws
+        between (pchar '(' .>> skipSpaces) (pchar ')' .>> skipSpaces) pTerm
+    ] .>> skipSpaces
 
 let pAbstraction =
     pipe3
-        (pchar '\\' .>> ws)
-        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> ws))
-        (pchar '.' .>> ws >>. pTerm)
+        (pchar '\\' .>> skipSpaces)
+        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces))
+        (pchar '.' .>> skipSpaces >>. pTerm)
         (fun _ args body ->
-            List.foldBack (fun arg acc -> Abstraction(arg, acc)) args body) .>> ws
+            List.foldBack (fun arg acc -> Abstraction(arg, acc)) args body) .>> skipSpaces
 
 let pFactorSequence =
     many1 pFactor |>>
     fun factors ->
         List.reduce (fun acc t -> Application(acc, t)) factors
 
-let pApplication = pFactorSequence .>> ws
+let pApplication = pFactorSequence .>> skipSpaces
 
 do pTermRef.Value <-
     choice [
         attempt pAbstraction
         attempt pApplication
         pFactor
-    ] .>> ws
+    ] .>> skipSpaces
 
 let pLetDef =
     pipe2
-        (pstring "let" >>. ws >>.  pVariable .>> ws)
-        (pchar '=' >>. ws >>. pTerm .>> ws)
-        (fun var term -> (var, term))
-
-let skipNewline1 = (pchar '\n' <|> pchar '\r') .>> ws
+        (pstring "let" >>. skipSpaces >>.  pVariable .>> skipSpaces)
+        (pchar '=' >>. skipSpaces >>. pTerm .>> skipSpaces)
+        (fun var term -> var, term)
 
 let pProgram =
     pipe2
-        (many (pLetDef .>> ws .>> skipNewline1))
+        (many (pLetDef .>> skipSpaces .>> skipNewline))
         pTerm
         (fun lets mainTerm ->
             let defs = Dictionary<Term, Term>()
             
             lets |> List.iter (fun (varName, term) ->
                 defs.[varName] <- term)
-            let rec substitute (term: Term) =
+
+            let rec expandLetDefs (term: Term) =
                 match term with
-                | Variable name when defs.ContainsKey(Variable name) -> defs.[Variable name]
-                | Application (term1, term2) -> Application(substitute term1, substitute term2)
-                | Abstraction (arg, body) -> Abstraction(arg, substitute body)
+                | Variable name when defs.ContainsKey(Variable name) ->
+                    defs.[Variable name]
+                | Application (term1, term2) ->
+                    Application(expandLetDefs term1, expandLetDefs term2)
+                | Abstraction (arg, body ) ->
+                    Abstraction(arg, expandLetDefs body) // ??????
                 | term -> term
             
-            substitute mainTerm)
+            let rec fullExpand term =
+                printf "\n\n------------\n%A\n---------\n" term
+                let expanded = expandLetDefs term
+                let res = betaReduction expanded
+                printf "%A\n" expanded
+                if res = term then term else expandLetDefs res
+
+            fullExpand mainTerm)
 
 
-let pExpr = ws >>. pProgram .>> eof
+let pExpr = skipSpaces >>. pProgram .>> eof
 
 let parse input =
     match run pExpr input with
