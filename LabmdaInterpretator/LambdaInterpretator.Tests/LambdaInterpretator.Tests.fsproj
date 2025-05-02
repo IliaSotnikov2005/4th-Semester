@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="LambdaParserTests.fs" />
+    <Compile Include="LambdaInterpretatorCoreTests.fs" />
+    <Compile Include="LambdaInterpretatorTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

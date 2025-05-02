@@ -1,7 +1,10 @@
 open LambdaInterpretator
 
-let example = "
-x y
-"
+let skk = "
+let S = \\x y z.x z (y z)
+    let K = \\x y.x
+S K K"
 
-printf "%s\n" ((interpretString "\x.y (a b)").PrettyPrint ())
+let result = (interpretString skk).PrettyPrint ()
+
+printf "%s\n" result

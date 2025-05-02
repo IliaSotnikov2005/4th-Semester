@@ -18,15 +18,15 @@ let pTerm, pTermRef = createParserForwardedToRef()
 let pFactor =
     choice [
         pVariable
-        between (pchar '(' .>> spaces) (pchar ')' .>> spaces) pTerm
+        between (pchar '(' .>> skipSpaces) (pchar ')' .>> skipSpaces) pTerm
     ] .>> skipSpaces
 
 /// Parses abstraction according to abstraction ::= \var_seq.term.
 let pAbstraction =
     pipe3
-        (pchar '\\' .>> spaces)
-        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> spaces))
-        (pchar '.' .>> spaces >>. pTerm)
+        (pchar '\\' .>> skipSpaces)
+        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces))
+        (pchar '.' .>> skipSpaces >>. pTerm)
         (fun _ args body ->
             List.foldBack (fun arg acc -> Abstraction(arg, acc)) args body) .>> skipSpaces
 
@@ -49,11 +49,9 @@ do pTermRef.Value <-
 
 /// Parses bind (let defenition) according to bind ::= "let" var "=" term.
 let pBind =
-    pipe2
+    tuple2
         (pstring "let" >>. skipSpaces >>.  pVariable .>> skipSpaces)
         (pchar '=' >>. skipSpaces >>. pTerm .>> skipSpaces)
-        (fun var term -> var, term)
-
 /// Parses program according to program ::= bind program | term.
 let pProgram =
     tuple2

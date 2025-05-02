@@ -6,8 +6,8 @@ open LambdaParser
 
 /// Interpret string with program.
 let interpretString lambdaString =
-    let defs, AST = parse lambdaString
-    let unwrapped = unwrapBinds (defs, AST)
+    let binds, AST = parse lambdaString
+    let unwrapped = unwrapBinds (binds, AST)
     betaReduction unwrapped
 
 /// Interpret file with program.
