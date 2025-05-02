@@ -53,24 +53,18 @@ let pProgram =
             lets |> List.iter (fun (varName, term) ->
                 defs.[varName] <- term)
 
-            let rec expandLetDefs (term: Term) =
+            let rec expandLetDefs (term: Term) (boundVars: Set<string>) =
                 match term with
-                | Variable name when defs.ContainsKey(Variable name) ->
-                    defs.[Variable name]
-                | Application (term1, term2) ->
-                    Application(expandLetDefs term1, expandLetDefs term2)
-                | Abstraction (arg, body ) ->
-                    Abstraction(arg, expandLetDefs body) // ??????
+                | Variable name when defs.ContainsKey(Variable name) && not (boundVars.Contains name) ->
+                    expandLetDefs defs.[Variable name] boundVars
+                | Application (t1, t2) ->
+                    Application (expandLetDefs t1 boundVars, expandLetDefs t2 boundVars)
+                | Abstraction (param, body) ->
+                    let newBoundVars = Set.add param boundVars
+                    Abstraction (param, expandLetDefs body newBoundVars)
                 | term -> term
-            
-            let rec fullExpand term =
-                printf "\n\n------------\n%A\n---------\n" term
-                let expanded = expandLetDefs term
-                let res = betaReduction expanded
-                printf "%A\n" expanded
-                if res = term then term else expandLetDefs res
 
-            fullExpand mainTerm)
+            expandLetDefs mainTerm Set.empty)
 
 
 let pExpr = skipSpaces >>. pProgram .>> eof

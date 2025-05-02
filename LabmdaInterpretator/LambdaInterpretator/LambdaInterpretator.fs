@@ -55,3 +55,18 @@ let rec betaReduction term =
         let reduced = Application(betaReduction t1, betaReduction t2)
         if reduced <> term then betaReduction reduced else reduced
     | Abstraction(x, body) -> Abstraction(x, betaReduction body)
+
+let rec prettyPrint term =
+    match term with
+    | Variable name -> printf "%s" name
+    | Abstraction (param, body) ->
+        printf "\\"
+        prettyPrint (Variable param)
+        printf "."
+        prettyPrint body
+    | Application (t1, t2) ->
+        printf "("
+        prettyPrint t1
+        printf " "
+        prettyPrint t2
+        printf ")"
