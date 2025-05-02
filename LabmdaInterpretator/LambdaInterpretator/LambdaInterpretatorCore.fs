@@ -6,25 +6,28 @@ type Term =
     | Variable of string
     | Application of Term * Term
     | Abstraction of string * Term
-    override x.ToString() = sprintf "%A" x 
 
-    member x.PrettyPrint() =
-        let rec printTerm term (needsParens: bool) =
+    /// Gives a string with the term as it is.
+    override this.ToString() = sprintf "%A" this
+
+    /// Gives a formatted string in the usual form.
+    member this.PrettyPrint() =
+        let rec format term precedence =
             match term with
             | Variable name -> name
             
-            | Abstraction (param, body) ->
-                let bodyStr = printTerm body false
-                let absStr = $"\\{param}.{bodyStr}"
-                if needsParens then $"({absStr})" else absStr
+            | Application (left, right) ->
+                let leftStr = format left 1
+                let rightStr = format right 2
+                let appStr = $"{leftStr} {rightStr}"
+                if precedence > 1 then $"({appStr})" else appStr
             
-            | Application (t1, t2) ->
-                let t1Str = printTerm t1 true
-                let t2Str = printTerm t2 true
-                let appStr = $"{t1Str} {t2Str}"
-                if needsParens then $"({appStr})" else appStr
+            | Abstraction (param, body) ->
+                let bodyStr = format body 0
+                let absStr = $"\\{param}.{bodyStr}"
+                if precedence > 0 then $"({absStr})" else absStr
         
-        printTerm x false
+        format this 0
 
 /// Finds free variables in a term.
 let freeVariables term =

@@ -4,32 +4,41 @@ open LambdaInterpretatorCore
 open FParsec
 open System.Collections.Generic
 
+/// Skip chars ' ', '\t'.
 let skipSpaces = skipMany (satisfy (fun c -> c = ' ' || c = '\t'))
+
+/// Parses variable according to var ::= [a-z]+.
 let pVariable = many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces |>> Variable
 
+/// Parses term according to term ::= abstraction | application | factor.
 let pTerm, pTermRef = createParserForwardedToRef()
 
+/// Parses factor according to factor ::= var | (term).
 let pFactor =
     choice [
         pVariable
-        between (pchar '(' .>> skipSpaces) (pchar ')' .>> skipSpaces) pTerm
+        between (pchar '(' .>> spaces) (pchar ')' .>> spaces) pTerm
     ] .>> skipSpaces
 
+/// Parses abstraction according to abstraction ::= \var_seq.term.
 let pAbstraction =
     pipe3
-        (pchar '\\' .>> skipSpaces)
-        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces))
-        (pchar '.' .>> skipSpaces >>. pTerm)
+        (pchar '\\' .>> spaces)
+        (many1 (many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> spaces))
+        (pchar '.' .>> spaces >>. pTerm)
         (fun _ args body ->
             List.foldBack (fun arg acc -> Abstraction(arg, acc)) args body) .>> skipSpaces
 
+/// Parses factor sequence according to factor_seq ::= factor factor_seq | factor.
 let pFactorSequence =
     many1 pFactor |>>
     fun factors ->
         List.reduce (fun acc t -> Application(acc, t)) factors
 
+/// Parses application according to application ::= factor factor_seq.
 let pApplication = pFactorSequence .>> skipSpaces
 
+// Parser realisation for pTerm.
 do pTermRef.Value <-
     choice [
         attempt pAbstraction
@@ -37,38 +46,43 @@ do pTermRef.Value <-
         pFactor
     ] .>> skipSpaces
 
-let pLetDef =
+/// Parses bind (let defenition) according to bind ::= "let" var "=" term.
+let pBind =
     pipe2
         (pstring "let" >>. skipSpaces >>.  pVariable .>> skipSpaces)
         (pchar '=' >>. skipSpaces >>. pTerm .>> skipSpaces)
         (fun var term -> var, term)
 
+/// Parses program according to program ::= bind program | term.
 let pProgram =
-    pipe2
-        (many (pLetDef .>> skipSpaces .>> many1 skipNewline))
+    tuple2
+        (many (pBind .>> skipSpaces .>> many1 skipNewline))
         pTerm
-        (fun lets mainTerm ->
-            let defs = Dictionary<Term, Term>()
-            
-            lets |> List.iter (fun (varName, term) ->
-                defs.[varName] <- term)
 
-            let rec expandLetDefs (term: Term) (boundVars: Set<string>) =
-                match term with
-                | Variable name when defs.ContainsKey(Variable name) && not (boundVars.Contains name) ->
-                    expandLetDefs defs.[Variable name] boundVars
-                | Application (term1, term2) ->
-                    Application (expandLetDefs term1 boundVars, expandLetDefs term2 boundVars)
-                | Abstraction (param, body) ->
-                    let newBoundVars = Set.add param boundVars
-                    Abstraction (param, expandLetDefs body newBoundVars)
-                | term -> term
+/// Unwraps all binds in term. 
+let unwrapBinds (lets: (Term * Term) list, mainTerm: Term) =
+    let binds = Dictionary<Term, Term>()
+    
+    lets |> List.iter (fun (varTerm, term) ->
+        binds.[varTerm] <- term)
 
-            expandLetDefs mainTerm Set.empty)
+    let rec unwrap (term: Term) (boundVars: Set<string>) =
+        match term with
+        | Variable name when binds.ContainsKey(Variable name) && not (boundVars.Contains name) ->
+            unwrap binds.[Variable name] boundVars
+        | Application (term1, term2) ->
+            Application (unwrap term1 boundVars, unwrap term2 boundVars)
+        | Abstraction (param, body) ->
+            let newBoundVars = Set.add param boundVars
+            Abstraction (param, unwrap body newBoundVars)
+        | term -> term
 
+    unwrap mainTerm Set.empty
 
+/// Auxiliary parser for pProgram.
 let pExpr = spaces >>. pProgram .>> spaces .>> eof
 
+/// Main parse function.
 let parse input =
     match run pExpr input with
     | Success(result, _, _) -> result
