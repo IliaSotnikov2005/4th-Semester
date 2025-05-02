@@ -2,7 +2,7 @@
 
 open Xunit
 open FsUnit.Xunit
-open LambdaInterpretator
+open LambdaInterpretatorCore
 
 [<Fact>]
 let ``freeVariables should return correct set for Variable`` () =

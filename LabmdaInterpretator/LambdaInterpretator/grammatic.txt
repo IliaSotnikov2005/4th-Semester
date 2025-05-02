@@ -8,6 +8,12 @@ term ::= abstraction | application | factor
 bind ::= let var = term
 program ::= bind program | term
 
+let T = \x y.x
+let F = \x y. y
+let pair = \t e c.c t e
+let fst = \p.p T
+fst (pair first second)
+
 x y z
 term -> application -> factor factor_seq -> var factor_seq ->
 x factor_seq -> x factor factor_seq -> x var factor_seq ->

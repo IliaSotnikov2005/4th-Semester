@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="LambdaInterpretator.fs" />
+    <Compile Include="LambdaInterpretatorCore.fs" />
     <Compile Include="LambdaParser.fs" />
+    <Compile Include="LambdaInterpretator.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

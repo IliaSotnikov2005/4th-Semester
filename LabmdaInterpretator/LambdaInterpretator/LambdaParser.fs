@@ -1,6 +1,6 @@
 module LambdaParser
 
-open LambdaInterpretator
+open LambdaInterpretatorCore
 open FParsec
 open System.Collections.Generic
 
@@ -45,7 +45,7 @@ let pLetDef =
 
 let pProgram =
     pipe2
-        (many (pLetDef .>> skipSpaces .>> skipNewline))
+        (many (pLetDef .>> skipSpaces .>> many1 skipNewline))
         pTerm
         (fun lets mainTerm ->
             let defs = Dictionary<Term, Term>()
@@ -57,8 +57,8 @@ let pProgram =
                 match term with
                 | Variable name when defs.ContainsKey(Variable name) && not (boundVars.Contains name) ->
                     expandLetDefs defs.[Variable name] boundVars
-                | Application (t1, t2) ->
-                    Application (expandLetDefs t1 boundVars, expandLetDefs t2 boundVars)
+                | Application (term1, term2) ->
+                    Application (expandLetDefs term1 boundVars, expandLetDefs term2 boundVars)
                 | Abstraction (param, body) ->
                     let newBoundVars = Set.add param boundVars
                     Abstraction (param, expandLetDefs body newBoundVars)
@@ -67,7 +67,7 @@ let pProgram =
             expandLetDefs mainTerm Set.empty)
 
 
-let pExpr = skipSpaces >>. pProgram .>> eof
+let pExpr = spaces >>. pProgram .>> spaces .>> eof
 
 let parse input =
     match run pExpr input with
