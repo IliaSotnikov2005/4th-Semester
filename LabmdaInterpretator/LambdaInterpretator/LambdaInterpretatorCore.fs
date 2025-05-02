@@ -1,4 +1,4 @@
-﻿/// A module containing lambda interpretator.
+﻿/// A module containing lambda interpretator core.
 module LambdaInterpretatorCore
 
 /// A type representing lambda term.

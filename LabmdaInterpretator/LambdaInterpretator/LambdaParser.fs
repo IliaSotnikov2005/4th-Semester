@@ -1,3 +1,4 @@
+/// A module containing labmda expression parser with let defenitions.
 module LambdaParser
 
 open LambdaInterpretatorCore
