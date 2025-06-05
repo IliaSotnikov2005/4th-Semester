@@ -67,16 +67,19 @@ let rec substitude var sub term =
     | _ -> term
 
 /// Performs beta-reduction.
-let rec betaReduction term depth =
-    if depth > 100 then term
-    else
-        match term with
-        | Variable _ -> term
-        | Application(Abstraction(param, body), arg) ->
-            betaReduction (substitude param arg body) (depth + 1)
-        | Application(t1, t2) ->
-            match betaReduction t1 (depth + 1) with
-            | Abstraction _ as reduced -> betaReduction (Application(reduced, t2)) (depth + 1)
-            | reduced -> Application(reduced, betaReduction t2 (depth + 1))
-        | Abstraction(param, body) ->
-            Abstraction(param, betaReduction body (depth + 1))
+let betaReduction term =
+    let rec reduce term depth =
+        if depth > 100 then term
+        else
+            match term with
+            | Variable _ -> term
+            | Application(Abstraction(param, body), arg) ->
+                reduce (substitude param arg body) (depth + 1)
+            | Application(t1, t2) ->
+                match reduce t1 (depth + 1) with
+                | Abstraction _ as reduced -> reduce (Application(reduced, t2)) (depth + 1)
+                | reduced -> Application(reduced, reduce t2 (depth + 1))
+            | Abstraction(param, body) ->
+                Abstraction(param, reduce body (depth + 1))
+    
+    reduce term 0
