@@ -73,6 +73,8 @@ let rec betaReduction term =
     | Application(Abstraction(param, body), arg) ->
         betaReduction (substitude param arg body)
     | Application(t1, t2) ->
-        let reduced = Application(betaReduction t1, betaReduction t2)
-        if reduced <> term then betaReduction reduced else reduced
-    | Abstraction(x, body) -> Abstraction(x, betaReduction body)
+        match betaReduction t1 with
+        | Abstraction _ as reduced -> betaReduction (Application(reduced, t2))
+        | reduced -> Application(reduced, betaReduction t2)
+    | Abstraction(param, body) ->
+        Abstraction(param, betaReduction body)
