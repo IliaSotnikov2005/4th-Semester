@@ -18,7 +18,7 @@ let downloadHtmlAsync (httpClient: HttpClient) (url: string) =
 
 /// Gets links from html.
 let getLinks (html: string) =
-    let pattern = @"<a\s+href\s*=\s*""https?://[^""]+""[^>]*>[^<]*<\/a>"
+    let pattern = @"<a\s+href\s*=\s*""(https?://[^""]+)""[^>]*>[^<]*<\/a>"
     Regex.Matches(html, pattern, RegexOptions.IgnoreCase)
     |> Seq.cast<Match>
     |> Seq.map (fun m -> m.Groups.[1].Value)
