@@ -53,17 +53,17 @@ let newVariable usedVariables =
     nextVariable "a"
 
 /// Performs substitude.
-let rec substitude var sub term =
+let rec substitute var sub term =
     match term with
     | Variable v when v = var -> sub
     | Application(t1, t2) -> 
-        Application(substitude var sub t1, substitude var sub t2)
+        Application(substitute var sub t1, substitute var sub t2)
     | Abstraction(param, body) when param = var -> term
     | Abstraction(param, body) when isFree param sub ->
         let newVar = newVariable (Set.union (freeVariables body) (freeVariables sub))
-        let newBody = substitude param (Variable newVar) body
-        Abstraction(newVar, substitude var sub newBody)
-    | Abstraction(param, body) -> Abstraction(param, substitude var sub body)
+        let newBody = substitute param (Variable newVar) body
+        Abstraction(newVar, substitute var sub newBody)
+    | Abstraction(param, body) -> Abstraction(param, substitute var sub body)
     | _ -> term
 
 /// Performs beta-reduction.
@@ -74,7 +74,7 @@ let betaReduction term =
             match term with
             | Variable _ -> term
             | Application(Abstraction(param, body), arg) ->
-                reduce (substitude param arg body) (depth + 1)
+                reduce (substitute param arg body) (depth + 1)
             | Application(t1, t2) ->
                 match reduce t1 (depth + 1) with
                 | Abstraction _ as reduced -> reduce (Application(reduced, t2)) (depth + 1)

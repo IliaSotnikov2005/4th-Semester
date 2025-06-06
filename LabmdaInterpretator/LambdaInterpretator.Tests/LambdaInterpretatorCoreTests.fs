@@ -38,19 +38,19 @@ let ``newVariable should return a new variable not in usedVariables`` () =
 [<Fact>]
 let ``substitude should replace variable in Variable term`` () =
     let term = Variable "x"
-    let result = substitude "x" (Variable "y") term
+    let result = substitute "x" (Variable "y") term
     result |> should equal (Variable "y")
 
 [<Fact>]
 let ``substitude should not replace variable in Application term if not matching`` () =
     let term = Application (Variable "x", Variable "y")
-    let result = substitude "z" (Variable "w") term
+    let result = substitute "z" (Variable "w") term
     result |> should equal term
 
 [<Fact>]
 let ``substitude should replace variable in Abstraction term is free`` () =
     let term = Abstraction ("x", Variable "y")
-    let result = substitude "y" (Variable "z") term
+    let result = substitute "y" (Variable "z") term
     result |> should equal (Abstraction ("x", Variable "z"))
 
 [<Fact>]
