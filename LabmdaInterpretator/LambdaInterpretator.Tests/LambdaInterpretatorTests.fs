@@ -13,7 +13,8 @@ S K K"
     let result = (interpretString skk).PrettyPrint ()
 
     result |> should equal "\\z.z"
-    
+
+[<Fact>]
 let ``fst (swap (pair first second)) should return second`` () =
     let fsp = "let T = \\x y.x
 let F = \\x y.y
@@ -26,3 +27,10 @@ fst(swap(pair first second))"
     let result = (interpretString fsp).PrettyPrint ()
 
     result |> should equal "second"
+
+[<Fact>]
+let ``interpretator should fail if variable name 'let'`` () =
+    let test = "let let = \\x.x
+    \\y.y"
+
+    (fun () -> interpretString test |> ignore) |> should throw typeof<System.ArgumentException>

@@ -9,7 +9,14 @@ open System.Collections.Generic
 let skipSpaces = skipMany (satisfy (fun c -> c = ' ' || c = '\t'))
 
 /// Parses variable according to var ::= [a-z]+.
-let pVariable = many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) .>> skipSpaces |>> Variable
+let pVariable = 
+    many1Chars (anyOf (['a'..'z'] @ ['A'..'Z'])) 
+    .>> skipSpaces 
+    >>= fun s -> 
+        if s.ToLower() = "let" then 
+            raise (new System.ArgumentException "Variable name 'let' is reserved.")
+        else 
+            preturn (Variable s)
 
 /// Parses term according to term ::= abstraction | application | factor.
 let pTerm, pTermRef = createParserForwardedToRef()
