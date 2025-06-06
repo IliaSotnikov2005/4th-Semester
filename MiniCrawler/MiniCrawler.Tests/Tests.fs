@@ -12,7 +12,7 @@ let ``downloadHtmlAsync should fail on non-existent URL`` () =
         let! result = downloadHtmlAsync httpClient "http://this.url.does.not.exist.test"
         
         match result with
-        | Ok _ -> Assert.Fail("Expected error for non-existent URL")
+        | Ok _ -> Assert.Fail "Expected error for non-existent URL"
         | Error msg -> 
             printfn "Got expected error for non-existent URL: %s" msg
     } |> Async.RunSynchronously
